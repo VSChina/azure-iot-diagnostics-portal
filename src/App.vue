@@ -7,8 +7,8 @@
         </div>
         <ul class="nav navbar-nav">
           <li><router-link to="/" exact>Home</router-link></li>
-          <li><router-link to="/test" exact>Link2</router-link></li>
-          <li><router-link to="#" exact>Link3</router-link></li>
+          <li><router-link to="/test" exact>Application Map</router-link></li>
+          <li><router-link to="#" exact>Kusto Query</router-link></li>
         </ul>
       </div>
     </nav>
@@ -23,6 +23,10 @@ export default {
 </script>
 
 <style>
+#app {
+  text-align: center;
+}
+
 .navbar {
   border-radius: 0;
 }
