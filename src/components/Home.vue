@@ -25,7 +25,12 @@
       </form>
     </div>
     <div class="result col-xs-6 col-xs-offset-3">
-      {{ result }}
+      <div>
+        {{ result }}
+      </div>
+      <pre v-if="detailedResult">
+        {{ detailedResult }}
+      </pre>
     </div>
   </div>
 </template>
@@ -36,19 +41,39 @@ export default {
   data () {
     return {
       msg: 'Diagnostics Settings',
-      connectionString: 'connectionString-abcd',
-      status: 'on',
+      connectionString: 'HostName=iot-hub-hendry.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=FE98m4TB4e5J/RzCpgtMV8+WXiXuZeRnBN8WzlaZTJQ=',
+      status: 'true',
       sample: '30',
-      result: ''
+      result: '',
+      detailedResult: ''
     }
   },
   methods: {
     updateSetting: function () {
-      this.result = 'Start!'
-      $.getJSON('https://vscedownloadcountwebapi.azurewebsites.net/formulahendry.code-runner/download-counts?dateInterval=Hour&intervalCount=11')
+      this.result = 'Start updating diagnostics settings...'
+      $.get(`https://zhqqi-diagnostic-rest.azurewebsites.net/job/trigger?diag_enable=${this.status}&diag_rate=${this.sample}&connection_string=${encodeURIComponent(this.connectionString)}`)
         .done((data) => {
-          console.log(data)
-          this.result = data
+          let jobId = data
+          this.result = 'Updating diagnostics settings...'
+          let jobMonitorInterval = setInterval(() => {
+            $.get(`https://zhqqi-diagnostic-rest.azurewebsites.net/job/get?id=${jobId}&connection_string=${encodeURIComponent(this.connectionString)}`)
+              .done((data) => {
+                if (data.status === 'completed' || data.status === 'failed' || data.status === 'cancelled') {
+                  this.result = 'Stauts: ' + data.status
+                  let detailedResult = {
+                    createdTime: data.createdTime,
+                    startTime: data.startTime,
+                    endTime: data.endTime,
+                    deviceJobStatistics: data.deviceJobStatistics
+                  }
+                  this.detailedResult = JSON.stringify(detailedResult, null, 2)
+                  clearInterval(jobMonitorInterval)
+                }
+              })
+          }, 1000)
+        })
+        .fail(() => {
+          this.result = 'Error: could not update diagnostics settings'
         })
     }
   }
@@ -85,5 +110,9 @@ label {
 
 .result {
   padding-top: 30px;
+}
+
+pre {
+  margin-top: 20px;
 }
 </style>
