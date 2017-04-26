@@ -6,17 +6,26 @@
         <div class="form-group">
           <div class="col-xs-6 col-xs-offset-3">
             <label for="connectionString">Connection String</label>
-            <input type="text" class="form-control" id="connectionString" v-model="connectionString" placeholder="HostName=<my-hub>.azure-devices.net;SharedAccessKeyName=<my-policy>;SharedAccessKey=<my-policy-key>">
+            <input type="text" class="form-control" id="connectionString" v-model="connectionString" placeholder="HostName=<my-hub>.azure-devices.net;SharedAccessKeyName=<my-policy>;SharedAccessKey=<my-policy-key>" required>
           </div>
         </div>
         <div class="form-group">
           <div class="col-xs-3 col-xs-offset-3">
             <label for="status">Status</label>
-            <input type="text" class="form-control" id="status" v-model="status" placeholder="status">
+            <select class="form-control" id="status" v-model="status">
+              <option>ON</option>
+              <option>OFF</option>
+            </select>
           </div>
           <div class="col-xs-3">
             <label for="sample">Sample</label>
-            <input type="text" class="form-control" id="sample" v-model="sample" placeholder="sample">
+            <input type="number" class="form-control" id="sample" v-model="sample" placeholder="sample" min="0" max="100">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-xs-6 col-xs-offset-3">
+            <label for="devices">Device List</label>
+            <textarea rows="1" class="form-control" id="devices" v-model="devices" placeholder="device1,device2"></textarea>
           </div>
         </div>
         <div class="update col-xs-6 col-xs-offset-3">
@@ -42,8 +51,9 @@ export default {
     return {
       msg: 'Diagnostics Settings',
       connectionString: '',
-      status: 'true',
-      sample: '30',
+      status: 'ON',
+      sample: '100',
+      devices: '',
       result: '',
       detailedResult: ''
     }
@@ -51,7 +61,7 @@ export default {
   methods: {
     updateSetting: function () {
       this.result = 'Start updating diagnostics settings...'
-      $.get(`https://zhqqi-diagnostic-rest.azurewebsites.net/job/trigger?diag_enable=${this.status}&diag_rate=${this.sample}&connection_string=${encodeURIComponent(this.connectionString)}`)
+      $.get(`https://zhqqi-diagnostic-rest.azurewebsites.net/job/trigger?diag_enable=${this.status === 'ON'}&diag_rate=${this.sample}&connection_string=${encodeURIComponent(this.connectionString)}`)
         .done((data) => {
           let jobId = data
           this.result = 'Updating diagnostics settings...'
