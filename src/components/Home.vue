@@ -41,7 +41,7 @@ export default {
   data () {
     return {
       msg: 'Diagnostics Settings',
-      connectionString: 'HostName=iot-hub-hendry.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=FE98m4TB4e5J/RzCpgtMV8+WXiXuZeRnBN8WzlaZTJQ=',
+      connectionString: '',
       status: 'true',
       sample: '30',
       result: '',
