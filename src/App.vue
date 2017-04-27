@@ -7,7 +7,7 @@
         </div>
         <ul class="nav navbar-nav">
           <li><router-link to="/" exact>Home</router-link></li>
-          <li><router-link to="/test" exact>Application Map</router-link></li>
+          <li><router-link to="/appmap" exact>Application Map</router-link></li>
           <li><router-link to="#" exact>Kusto Query</router-link></li>
         </ul>
       </div>
