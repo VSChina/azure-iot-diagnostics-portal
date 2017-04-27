@@ -25,7 +25,7 @@
         <div class="form-group">
           <div class="col-xs-6 col-xs-offset-3">
             <label for="devices">Device List</label>
-            <textarea rows="1" class="form-control" id="devices" v-model="devices" placeholder="device1,device2"></textarea>
+            <textarea rows="1" class="form-control" id="devices" v-model="devices" placeholder="device1,device2,device3 or leave blank to update all devices"></textarea>
           </div>
         </div>
         <div class="update col-xs-6 col-xs-offset-3">
@@ -45,6 +45,8 @@
 </template>
 
 <script>
+const endpoint = 'https://zhqqi-diagnostic-rest.azurewebsites.net'
+
 export default {
   name: 'home',
   data () {
@@ -60,13 +62,22 @@ export default {
   },
   methods: {
     updateSetting: function () {
+      if (!this.connectionString) {
+        this.result = 'Please fill out connection string.'
+        return
+      }
       this.result = 'Start updating diagnostics settings...'
-      $.get(`https://zhqqi-diagnostic-rest.azurewebsites.net/job/trigger?diag_enable=${this.status === 'ON'}&diag_rate=${this.sample}&connection_string=${encodeURIComponent(this.connectionString)}`)
+      this.detailedResult = ''
+      let url = `${endpoint}/job/trigger?diag_enable=${this.status === 'ON'}&diag_rate=${this.sample}&connection_string=${encodeURIComponent(this.connectionString)}`
+      if (this.devices) {
+        url += `&devices=${this.devices}`
+      }
+      $.get(url)
         .done((data) => {
           let jobId = data
           this.result = 'Updating diagnostics settings...'
           let jobMonitorInterval = setInterval(() => {
-            $.get(`https://zhqqi-diagnostic-rest.azurewebsites.net/job/get?id=${jobId}&connection_string=${encodeURIComponent(this.connectionString)}`)
+            $.get(`${endpoint}/job/get?id=${jobId}&connection_string=${encodeURIComponent(this.connectionString)}`)
               .done((data) => {
                 if (data.status === 'completed' || data.status === 'failed' || data.status === 'cancelled') {
                   this.result = 'Stauts: ' + data.status
