@@ -23,7 +23,11 @@
           </div>
         </div>
         <div class="form-group">
-          <div class="col-xs-6 col-xs-offset-3">
+          <div class="col-xs-2 col-xs-offset-3">
+            <label for="file">Device File</label>
+            <input type="file" class="form-control" id="file" v-on:change="onFileChange">
+          </div>
+          <div class="col-xs-4">
             <label for="devices">Device List</label>
             <textarea rows="1" class="form-control" id="devices" v-model="devices" placeholder="device1,device2,device3 or leave blank to update all devices"></textarea>
           </div>
@@ -96,6 +100,18 @@ export default {
         .fail(() => {
           this.result = 'Error: could not update diagnostics settings'
         })
+    },
+    onFileChange: function (e) {
+      let files = e.target.files || e.dataTransfer.files
+      if (!files.length) {
+        return
+      }
+      let file = files[0]
+      var reader = new FileReader()
+      reader.onload = (e) => {
+        this.devices = e.target.result
+      }
+      reader.readAsBinaryString(file)
     }
   }
 }
