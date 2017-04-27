@@ -1,6 +1,6 @@
 <template>
   <div id="diagram-container">
-    <div id="item_left" class="item" style="margin-left:70px;">
+    <div id="item_left" class="item">
       <div>
         <p class="item-title">Devices</p>
       </div>
@@ -27,7 +27,7 @@
         </table>
       </div>
     </div>
-    <div id="item_middle" class="item" style="margin-left:150px;">
+    <div id="item_middle" class="item">
       <div>
         <p class="item-title">IoT Hub</p>
       </div>
@@ -68,7 +68,7 @@
         </table>
       </div>
     </div>
-    <div id="item_right" class="item" style="margin-left:150px;">
+    <div id="item_right" class="item">
       <div>
         <p class="item-title">Stream Analytics</p>
       </div>
@@ -112,7 +112,7 @@
 var jsPlumb = require('jsplumb').jsPlumb
 
 export default {
-  name: 'test',
+  name: 'appMap',
   data () {
     return {
       device: {deviceNum: 1, msgSent: 0, latency: 0},
@@ -191,6 +191,18 @@ export default {
   min-width: 1100px;
   text-align: left;
   margin: auto;
+}
+
+#item_left{
+  margin-left:70px;
+}
+
+#item_middle{
+  margin-left: 150px;
+}
+
+#item_right{
+  margin-left:150px;
 }
 
 .item {
