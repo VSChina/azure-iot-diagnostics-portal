@@ -39,6 +39,7 @@
     </div>
     <div class="result col-xs-6 col-xs-offset-3">
       <div>
+        <div v-if='isUpdating' class="loader"></div>
         {{ result }}
       </div>
       <pre v-if="detailedResult">
@@ -61,7 +62,8 @@ export default {
       sample: '100',
       devices: '',
       result: '',
-      detailedResult: ''
+      detailedResult: '',
+      isUpdating: false
     }
   },
   methods: {
@@ -73,6 +75,7 @@ export default {
       // localStorage.setItem('connectionString', this.connectionString)
       this.result = 'Start updating diagnostics settings...'
       this.detailedResult = ''
+      this.isUpdating = true
       let url = `${endpoint}/job/trigger?diag_enable=${this.status === 'ON'}&diag_rate=${this.sample}&connection_string=${encodeURIComponent(this.connectionString)}`
       if (this.devices) {
         url += `&devices=${this.devices}`
@@ -94,12 +97,14 @@ export default {
                   }
                   this.detailedResult = JSON.stringify(detailedResult, null, 2)
                   clearInterval(jobMonitorInterval)
+                  this.isUpdating = false
                 }
               })
           }, 1000)
         })
         .fail(() => {
           this.result = 'Error: could not update diagnostics settings'
+          this.isUpdating = false
         })
     },
     onFileChange: function (e) {
@@ -152,5 +157,26 @@ label {
 
 pre {
   margin-top: 20px;
+}
+
+.loader {
+  border: 5px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 5px solid #3498db;
+  width: 40px;
+  height: 40px;
+  -webkit-animation: spin 1s linear infinite;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
