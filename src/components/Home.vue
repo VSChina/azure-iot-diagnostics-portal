@@ -33,7 +33,7 @@
           </div>
         </div>
         <div class="update col-xs-6 col-xs-offset-3">
-          <button v-on:click="updateSetting" type="button">Update</button>
+          <button v-on:click="updateSetting" type="button" v-bind:disabled="isUpdating">Update</button>
         </div>
       </form>
     </div>
