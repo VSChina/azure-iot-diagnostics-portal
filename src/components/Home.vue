@@ -102,8 +102,9 @@ export default {
               })
           }, 1000)
         })
-        .fail(() => {
+        .fail((err) => {
           this.result = 'Error: could not update diagnostics settings'
+          this.detailedResult = err
           this.isUpdating = false
         })
     },
