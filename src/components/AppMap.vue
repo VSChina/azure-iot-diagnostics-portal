@@ -5,25 +5,21 @@
         <p class="item-title">Devices</p>
       </div>
       <div class="table-container">
-        <table class="table-style" >
+        <table class="item-left-table" >
           <col width="30%">
-          <col width="50%">
-          <col width="20%" align="right">
+          <col width="60%">
+          <col width="20" align="right">
           <tr>
-            <td>{{device.deviceNum}}</td>
-            <td>Devices</td>
+            <td>{{device.registeredNum}}</td>
+            <td>Registered Devices</td>
             <td></td>
           </tr>
           <tr>
-            <td>{{device.msgSent}}</td>
-            <td>Msgs Sent</td>
+            <td>{{device.connectedNum}}</td>
+            <td>Connected Devices</td>
             <td></td>
           </tr>
-          <tr>
-            <td>{{device.latency}} ms</td>
-            <td>Avg Latency</td>
-            <td></td>
-          </tr>
+
         </table>
       </div>
     </div>
@@ -32,38 +28,19 @@
         <p class="item-title">IoT Hub</p>
       </div>
       <div class="table-container">
-        <table class="table-style">
-          <col width="20%">
+        <table class="item-middle-table">
+          <col width="35%">
           <col width="60%">
           <col width="20%" align="right">
           <tr>
-            <td>{{iotHub.msgIngress}}</td>
-            <td>Msgs Ingress</td>
+            <td>{{iotHub.latency}} ms</td>
+            <td>Avg Latency</td>
             <td></td>
           </tr>
           <tr>
-            <td>{{iotHub.msgEgress}}</td>
-            <td>Msgs Egress</td>
+            <td>{{iotHub.msgReceived}}</td>
+            <td>Msgs Received</td>
             <td></td>
-          </tr>
-          <tr>
-            <td>{{iotHub.deviceConnected}}</td>
-            <td>Devices Connected</td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>{{iotHub.failures}}%</td>
-            <td>Failures</td>
-            <td>
-              <div class="svg-style">
-                <svg viewBox="0 0 16 16" role="presentation" aria-hidden="true" focusable="false">
-                  <g aria-hidden="true" role="presentation">
-                    <circle cx="8" cy="8" r="8" aria-hidden="true" role="presentation" class="msportalfx-svg-c14" style="fill: green;"></circle>
-                    <path d="M3.989 8.469L3.7 8.156a.207.207 0 0 1 .012-.293l.835-.772a.204.204 0 0 1 .289.012l2.296 2.462 3.951-5.06a.204.204 0 0 1 .289-.035l.903.697a.198.198 0 0 1 .035.285l-5.075 6.497-3.246-3.48z" aria-hidden="true" role="presentation" class="msportalfx-svg-c01" style="fill: white;"></path>
-                  </g>
-                </svg>
-              </div>
-            </td>
           </tr>
         </table>
       </div>
@@ -73,18 +50,18 @@
         <p class="item-title">Stream Analytics</p>
       </div>
       <div class="table-container">
-        <table class="table-style">
-          <col width="20%">
+        <table class="item-right-table">
+          <col width="35%">
           <col width="60%">
-          <col width="20%"  align="right">
+          <col width="20%" align="right">
           <tr>
             <td>{{streamAnalytics.processedMessage}}</td>
             <td>Msgs Processed</td>
             <td></td>
           </tr>
           <tr>
-            <td>{{streamAnalytics.latency}}</td>
-            <td>Average Latency</td>
+            <td>{{streamAnalytics.latency}} ms</td>
+            <td>Avg Latency</td>
             <td></td>
           </tr>
           <tr>
@@ -92,17 +69,44 @@
             <td>Failures</td>
             <td>
               <div class="svg-style">
-                <svg viewBox="0 0 16 16" role="presentation" aria-hidden="true" focusable="false">
+
+                <svg viewBox="0 0 16 16" role="presentation" aria-hidden="true" focusable="false" v-if="streamAnalytics.failures < 5">
                   <g aria-hidden="true" role="presentation">
                     <circle cx="8" cy="8" r="8" aria-hidden="true" role="presentation" class="msportalfx-svg-c14" style="fill: green;"></circle>
                     <path d="M3.989 8.469L3.7 8.156a.207.207 0 0 1 .012-.293l.835-.772a.204.204 0 0 1 .289.012l2.296 2.462 3.951-5.06a.204.204 0 0 1 .289-.035l.903.697a.198.198 0 0 1 .035.285l-5.075 6.497-3.246-3.48z" aria-hidden="true" role="presentation" class="msportalfx-svg-c01" style="fill: white;"></path>
                   </g>
                 </svg>
+
+                <svg viewBox="0 0 9 9" role="presentation" aria-hidden="true" focusable="false" v-if="streamAnalytics.failures >= 5 && streamAnalytics.failures < 20">
+                  <g aria-hidden="true" role="presentation">
+                    <path d="M8.267 8H.733c-.6 0-.916-.623-.62-1.129L2.014 3.53 3.896.384c.302-.507.903-.514 1.197-.008L7.001 3.65l1.882 3.229C9.183 7.383 8.881 8 8.267 8z" aria-hidden="true" role="presentation" class="msportalfx-svg-c10" style="fill: #ff8c00;"></path>
+                    <circle cx="4.5" cy="6.178" r="0.615" aria-hidden="true" role="presentation" class="msportalfx-svg-c01" style="fill: #fff;"></circle>
+                    <path d="M4.623 2.428H3.98l.164 2.85h.774l.165-2.85z" aria-hidden="true" role="presentation" class="msportalfx-svg-c01" style="fill: #fff;"></path>
+                  </g>
+                </svg>
+
+                <svg viewBox="0 0 9 9" role="presentation" aria-hidden="true" focusable="false" v-if="streamAnalytics.failures >= 20">
+                  <g aria-hidden="true" role="presentation">
+                    <circle cx="4.5" cy="4.5" r="4.5" aria-hidden="true" role="presentation" class="msportalfx-svg-c22" style="fill: #e81123;"></circle>
+                    <circle cx="4.5" cy="6.438" r="0.697" aria-hidden="true" role="presentation" class="msportalfx-svg-c01" style="fill: #fff;"></circle>
+                    <path d="M4.604 2.186h-.729l.186 3.232h.878l.186-3.232z" aria-hidden="true" role="presentation" class="msportalfx-svg-c01" style="fill: #fff;"></path>
+                  </g>
+                </svg>
+
               </div>
             </td>
           </tr>
         </table>
       </div>
+    </div>
+    <div class="select">
+    <label for="selected">Timespan</label>
+    <select class="form-control" v-model="selected" @change="updateMetricsParam()">
+      <option value="PT5M">5 Minutes</option>
+      <option value="PT1H">1 Hour</option>
+      <option value="PT24H">24 Hour</option>
+      <option value="P7D">7 Day</option>
+    </select>
     </div>
   </div>
 </template>
@@ -111,20 +115,129 @@
 
 var jsPlumb = require('jsplumb').jsPlumb
 
+class AppMapAutoUpdator {
+
+  constructor (callInterval) {
+    this.callInterval = callInterval
+    this.deviceInfoInterval = callInterval
+    this.d2cPath = 'customMetrics/D2CLatency'
+    this.saPath = 'customMetrics/StreamJobLatency'
+    this.d2cLatencyParam = null
+    this.d2cLatencyCallback = null
+    this.mertricsParam = null
+    this.saLatencyCallback = null
+    this.deviceInfoParam = null
+    this.deviceInfoCallback = null
+  }
+
+  getMetrics (param, callback) {
+    $.ajax({
+      url: `http://zhqqi-diagnostic-rest.azurewebsites.net/metric/get/${param}`,
+      datatype: 'json',
+      success: function (data) {
+        callback(data)
+      }
+    })
+  }
+
+  getDeviceInfo (callback) {
+    $.ajax({
+      url: `http://zhqqi-diagnostic-rest.azurewebsites.net/device/get_total`,
+      datatype: 'json',
+      success: function (data) {
+        callback(data)
+      }
+    })
+  }
+
+  updateMetricsParam (param) {
+    this.mertricsParam = param
+  }
+
+  setMetricsCallBack (param, callback) {
+    this.mertricsParam = param
+    this.mertricsCallback = callback
+  }
+
+  setDeviceInfoCallback (callback) {
+    this.deviceInfoCallback = callback
+  }
+
+  startAll () {
+    var that = this
+    this.intervalId = setInterval(function () {
+      if (that.mertricsParam && that.mertricsCallback) {
+        that.getMetrics(that.mertricsParam, that.mertricsCallback)
+      }
+    }, this.callInterval)
+
+    this.deviceInfoIntervalId = setInterval(function () {
+      if (that.deviceInfoCallback) {
+        that.getDeviceInfo(that.deviceInfoCallback)
+      }
+    }, this.deviceInfoInterval)
+  }
+
+  stopAll () {
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
+    }
+    if (this.deviceInfoIntervalId) {
+      clearInterval(this.deviceInfoIntervalId)
+    }
+  }
+};
+
+var updator = new AppMapAutoUpdator(5000)
 export default {
   name: 'appMap',
   data () {
     return {
-      device: {deviceNum: 1, msgSent: 0, latency: 0},
-      iotHub: {msgIngress: 1, msgEgress: 0, deviceConnected: 0, failures: 0},
-      streamAnalytics: {processedMessage: 1, latency: 0, failures: 0},
-      msg: 'Diagnostics Settings'
+      device: { registeredNum: 1, connectedNum: 0 },
+      iotHub: { latency: 1, msgReceived: 0 },
+      streamAnalytics: { processedMessage: 1, latency: 0, failures: 15 },
+      selected: 'P7D'
     }
   },
   beforeDestroy () {
     jsPlumb.detachEveryConnection()
   },
+  methods: {
+    updateMetricsParam: function () {
+      updator.updateMetricsParam(`timespan=${this.selected}`)
+    }
+  },
   mounted () {
+    var that = this
+
+    updator.setMetricsCallBack(`timespan=${this.selected}`, function (data) {
+      console.log(data)
+      if (data.d2c_avg === null) {
+        that.iotHub.latency = 'NaN'
+      } else {
+        that.iotHub.latency = data.d2c_avg
+      }
+
+      if (data.sa_avg === null) {
+        that.streamAnalytics.latency = 'NaN'
+      } else {
+        that.streamAnalytics.latency = data.sa_avg
+      }
+
+      that.iotHub.msgReceived = data.d2c_count
+      that.streamAnalytics.processedMessage = data.sa_count
+
+      that.streamAnalytics.failures = data.failure_sum
+    })
+
+    updator.setDeviceInfoCallback(function (data) {
+      console.log(data)
+      that.device.connectedNum = data.connected
+      that.device.registeredNum = data.registered
+    })
+
+    updator.startAll()
+
     jsPlumb.ready(function () {
       jsPlumb.connect({
         paintStyle: {
@@ -193,26 +306,55 @@ export default {
   margin: auto;
 }
 
-#item_left{
-  margin-left:70px;
+#item_left {
+  margin-left: 70px;
+  bottom: 10px;
 }
 
-#item_middle{
+.select{
+  width: 150px;
+  float: right;
+  margin-top: 10px;
+}
+
+.item-left-table{
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+}
+
+#item_middle {
   margin-left: 150px;
 }
 
-#item_right{
-  margin-left:150px;
+.item-middle-table{
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+}
+
+#item_right {
+  margin-left: 150px;
+}
+
+.item-right-table{
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
 }
 
 .item {
-  height: 120px;
+  height: 100px;
   width: 200px;
   border: 1px solid #d0d0d0;
   float: left;
   background-color: #F8F8F8;
   font-size: 12px;
 }
+
 .item-title {
   margin: 5px 0;
   text-align: center;
@@ -227,6 +369,7 @@ export default {
 
 .svg-style {
   width: 15px;
+  height: 15px;
   margin: auto;
 }
 
@@ -236,11 +379,6 @@ export default {
   margin: 0 4px;
 }
 
-.table-style {
-  position: absolute;
-  bottom: 5px;
-  left: 0;
-  width: 100%;
-}
+
 </style>
 
