@@ -3,12 +3,12 @@
     <h1>{{ msg }}</h1>
     <div>
       <form>
-        <div class="form-group">
+        <!--<div class="form-group">
           <div class="col-xs-6 col-xs-offset-3">
             <label for="connectionString">Connection String</label>
             <input type="text" class="form-control" id="connectionString" v-model="connectionString" placeholder="HostName=<my-hub>.azure-devices.net;SharedAccessKeyName=<my-policy>;SharedAccessKey=<my-policy-key>" required>
           </div>
-        </div>
+        </div>-->
         <div class="form-group">
           <div class="col-xs-3 col-xs-offset-3">
             <label for="status">Status</label>
@@ -56,7 +56,7 @@ export default {
   data () {
     return {
       msg: 'Diagnostics Settings',
-      connectionString: '',
+      connectionString: localStorage.getItem('connectionString'),
       status: 'ON',
       sample: '100',
       devices: '',
@@ -66,10 +66,11 @@ export default {
   },
   methods: {
     updateSetting: function () {
-      if (!this.connectionString) {
-        this.result = 'Please fill out connection string.'
-        return
-      }
+      // if (!this.connectionString) {
+      //   this.result = 'Please fill out connection string.'
+      //   return
+      // }
+      // localStorage.setItem('connectionString', this.connectionString)
       this.result = 'Start updating diagnostics settings...'
       this.detailedResult = ''
       let url = `${endpoint}/job/trigger?diag_enable=${this.status === 'ON'}&diag_rate=${this.sample}&connection_string=${encodeURIComponent(this.connectionString)}`
