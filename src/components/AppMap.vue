@@ -194,7 +194,7 @@ export default {
       device: { registeredNum: 1, connectedNum: 0 },
       iotHub: { latency: 1, msgReceived: 0 },
       streamAnalytics: { processedMessage: 1, latency: 0, failures: 15 },
-      selected: 'P7D'
+      selected: 'PT5M'
     }
   },
   beforeDestroy () {
