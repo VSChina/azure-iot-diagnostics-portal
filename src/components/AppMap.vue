@@ -132,6 +132,15 @@ class AppMapAutoUpdator {
       datatype: 'json',
       success: function (data) {
         callback(data)
+      },
+      complete: () => {
+        if (this.enabled) {
+          setTimeout(() => {
+            if (this.mertricsParam && this.mertricsCallback) {
+              this.getMetrics(this.mertricsParam, this.mertricsCallback)
+            }
+          }, this.callInterval)
+        }
       }
     })
   }
@@ -141,6 +150,15 @@ class AppMapAutoUpdator {
       datatype: 'json',
       success: function (data) {
         callback(data)
+      },
+      complete: () => {
+        if (this.enabled) {
+          setTimeout(() => {
+            if (this.deviceInfoCallback) {
+              this.getDeviceInfo(this.deviceInfoCallback)
+            }
+          }, this.callInterval)
+        }
       }
     })
   }
@@ -156,24 +174,16 @@ class AppMapAutoUpdator {
   }
   startAll () {
     var that = this
-    this.intervalId = setInterval(function () {
-      if (that.mertricsParam && that.mertricsCallback) {
-        that.getMetrics(that.mertricsParam, that.mertricsCallback)
-      }
-    }, this.callInterval)
-    this.deviceInfoIntervalId = setInterval(function () {
-      if (that.deviceInfoCallback) {
-        that.getDeviceInfo(that.deviceInfoCallback)
-      }
-    }, this.deviceInfoInterval)
+    this.enabled = true
+    if (that.mertricsParam && that.mertricsCallback) {
+      that.getMetrics(that.mertricsParam, that.mertricsCallback)
+    }
+    if (that.deviceInfoCallback) {
+      that.getDeviceInfo(that.deviceInfoCallback)
+    }
   }
   stopAll () {
-    if (this.intervalId) {
-      clearInterval(this.intervalId)
-    }
-    if (this.deviceInfoIntervalId) {
-      clearInterval(this.deviceInfoIntervalId)
-    }
+    this.enabled = false
   }
 };
 var updator = new AppMapAutoUpdator(2000)
