@@ -208,7 +208,7 @@ export default {
   mounted () {
     var that = this
     updator.setMetricsCallBack(`timespan=${this.selected}`, function (data) {
-      console.log(data)
+      // console.log(data)
       if (data.d2c_avg === null) {
         that.iotHub.latency = 'NaN'
       } else {
@@ -224,7 +224,7 @@ export default {
       that.streamAnalytics.failures = data.failure_sum
     })
     updator.setDeviceInfoCallback(function (data) {
-      console.log(data)
+      // console.log(data)
       that.device.connectedNum = data.connected
       that.device.registeredNum = data.registered
     })
