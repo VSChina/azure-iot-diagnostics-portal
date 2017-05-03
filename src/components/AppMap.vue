@@ -29,8 +29,8 @@
       </div>
       <div class="table-container">
         <table class="item-middle-table">
-          <col width="35%">
-          <col width="60%">
+          <col width="45%">
+          <col width="50%">
           <col width="20%" align="right">
           <tr>
             <td>{{iotHub.msgReceived}}</td>
@@ -51,8 +51,8 @@
       </div>
       <div class="table-container">
         <table class="item-right-table">
-          <col width="35%">
-          <col width="60%">
+          <col width="45%">
+          <col width="50%">
           <col width="20%" align="right">
           <tr>
             <td>{{streamAnalytics.processedMessage+streamAnalytics.failures}}</td>
