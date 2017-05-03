@@ -33,13 +33,13 @@
           <col width="60%">
           <col width="20%" align="right">
           <tr>
-            <td>{{iotHub.latency}} ms</td>
-            <td>Avg Latency</td>
+            <td>{{iotHub.msgReceived}}</td>
+            <td>Msgs Received</td>
             <td></td>
           </tr>
           <tr>
-            <td>{{iotHub.msgReceived}}</td>
-            <td>Msgs Received</td>
+            <td>{{isNaN(iotHub.latency) ? "-" : iotHub.latency+" ms"}}</td>
+            <td>Avg Latency</td>
             <td></td>
           </tr>
         </table>
@@ -60,12 +60,12 @@
             <td></td>
           </tr>
           <tr>
-            <td>{{streamAnalytics.latency}} ms</td>
+            <td>{{isNaN(streamAnalytics.latency) ? "-" : streamAnalytics.latency+" ms"}}</td>
             <td>Avg Latency</td>
             <td></td>
           </tr>
           <tr>
-            <td>{{(streamAnalytics.failures/(streamAnalytics.processedMessage+streamAnalytics.failures)*100).toFixed(2)}}%</td>
+            <td>{{streamAnalytics.processedMessage+streamAnalytics.failures == 0 ? "0" : (streamAnalytics.failures/(streamAnalytics.processedMessage+streamAnalytics.failures)*100).toFixed(2) + "%"}}</td>
             <td>Failures</td>
             <td>
               <div class="svg-style">
