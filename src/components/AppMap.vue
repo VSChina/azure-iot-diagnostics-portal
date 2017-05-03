@@ -55,7 +55,7 @@
           <col width="60%">
           <col width="20%" align="right">
           <tr>
-            <td>{{streamAnalytics.processedMessage}}</td>
+            <td>{{streamAnalytics.processedMessage+streamAnalytics.failures}}</td>
             <td>Msgs Processed</td>
             <td></td>
           </tr>
@@ -65,7 +65,7 @@
             <td></td>
           </tr>
           <tr>
-            <td>{{streamAnalytics.failures}}%</td>
+            <td>{{(streamAnalytics.failures/(streamAnalytics.processedMessage+streamAnalytics.failures)*100).toFixed(2)}}%</td>
             <td>Failures</td>
             <td>
               <div class="svg-style">
@@ -176,7 +176,7 @@ class AppMapAutoUpdator {
     }
   }
 };
-var updator = new AppMapAutoUpdator(5000)
+var updator = new AppMapAutoUpdator(2000)
 export default {
   name: 'appMap',
   data () {
