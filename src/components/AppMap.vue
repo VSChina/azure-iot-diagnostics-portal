@@ -29,17 +29,17 @@
       </div>
       <div class="table-container">
         <table class="item-middle-table">
-          <col width="35%">
-          <col width="60%">
+          <col width="45%">
+          <col width="50%">
           <col width="20%" align="right">
-          <tr>
-            <td>{{iotHub.latency}} ms</td>
-            <td>Avg Latency</td>
-            <td></td>
-          </tr>
           <tr>
             <td>{{iotHub.msgReceived}}</td>
             <td>Msgs Received</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>{{isNaN(iotHub.latency) ? "-" : iotHub.latency+" ms"}}</td>
+            <td>Avg Latency</td>
             <td></td>
           </tr>
         </table>
@@ -51,21 +51,21 @@
       </div>
       <div class="table-container">
         <table class="item-right-table">
-          <col width="35%">
-          <col width="60%">
+          <col width="45%">
+          <col width="50%">
           <col width="20%" align="right">
           <tr>
-            <td>{{streamAnalytics.processedMessage}}</td>
+            <td>{{streamAnalytics.processedMessage+streamAnalytics.failures}}</td>
             <td>Msgs Processed</td>
             <td></td>
           </tr>
           <tr>
-            <td>{{streamAnalytics.latency}} ms</td>
+            <td>{{isNaN(streamAnalytics.latency) ? "-" : streamAnalytics.latency+" ms"}}</td>
             <td>Avg Latency</td>
             <td></td>
           </tr>
           <tr>
-            <td>{{streamAnalytics.failures}}%</td>
+            <td>{{streamAnalytics.processedMessage+streamAnalytics.failures == 0 ? "0" : (streamAnalytics.failures/(streamAnalytics.processedMessage+streamAnalytics.failures)*100).toFixed(2) + "%"}}</td>
             <td>Failures</td>
             <td>
               <div class="svg-style">
@@ -112,11 +112,8 @@
 </template>
 
 <script>
-
 var jsPlumb = require('jsplumb').jsPlumb
-
 class AppMapAutoUpdator {
-
   constructor (callInterval) {
     this.callInterval = callInterval
     this.deviceInfoInterval = callInterval
@@ -129,66 +126,67 @@ class AppMapAutoUpdator {
     this.deviceInfoParam = null
     this.deviceInfoCallback = null
   }
-
   getMetrics (param, callback) {
     $.ajax({
-      url: `http://zhqqi-diagnostic-rest.azurewebsites.net/metric/get/${param}`,
+      url: `https://zhqqi-diagnostic-rest.azurewebsites.net/metric/get/${param}`,
       datatype: 'json',
       success: function (data) {
         callback(data)
+      },
+      complete: () => {
+        if (this.enabled) {
+          setTimeout(() => {
+            if (this.mertricsParam && this.mertricsCallback) {
+              this.getMetrics(this.mertricsParam, this.mertricsCallback)
+            }
+          }, this.callInterval)
+        }
       }
     })
   }
-
   getDeviceInfo (callback) {
     $.ajax({
-      url: `http://zhqqi-diagnostic-rest.azurewebsites.net/device/get_total`,
+      url: `https://zhqqi-diagnostic-rest.azurewebsites.net/device/get_total`,
       datatype: 'json',
       success: function (data) {
         callback(data)
+      },
+      complete: () => {
+        if (this.enabled) {
+          setTimeout(() => {
+            if (this.deviceInfoCallback) {
+              this.getDeviceInfo(this.deviceInfoCallback)
+            }
+          }, this.callInterval)
+        }
       }
     })
   }
-
   updateMetricsParam (param) {
     this.mertricsParam = param
   }
-
   setMetricsCallBack (param, callback) {
     this.mertricsParam = param
     this.mertricsCallback = callback
   }
-
   setDeviceInfoCallback (callback) {
     this.deviceInfoCallback = callback
   }
-
   startAll () {
     var that = this
-    this.intervalId = setInterval(function () {
-      if (that.mertricsParam && that.mertricsCallback) {
-        that.getMetrics(that.mertricsParam, that.mertricsCallback)
-      }
-    }, this.callInterval)
-
-    this.deviceInfoIntervalId = setInterval(function () {
-      if (that.deviceInfoCallback) {
-        that.getDeviceInfo(that.deviceInfoCallback)
-      }
-    }, this.deviceInfoInterval)
+    this.enabled = true
+    if (that.mertricsParam && that.mertricsCallback) {
+      that.getMetrics(that.mertricsParam, that.mertricsCallback)
+    }
+    if (that.deviceInfoCallback) {
+      that.getDeviceInfo(that.deviceInfoCallback)
+    }
   }
-
   stopAll () {
-    if (this.intervalId) {
-      clearInterval(this.intervalId)
-    }
-    if (this.deviceInfoIntervalId) {
-      clearInterval(this.deviceInfoIntervalId)
-    }
+    this.enabled = false
   }
 };
-
-var updator = new AppMapAutoUpdator(5000)
+var updator = new AppMapAutoUpdator(2000)
 export default {
   name: 'appMap',
   data () {
@@ -196,7 +194,7 @@ export default {
       device: { registeredNum: 1, connectedNum: 0 },
       iotHub: { latency: 1, msgReceived: 0 },
       streamAnalytics: { processedMessage: 1, latency: 0, failures: 15 },
-      selected: 'P7D'
+      selected: 'PT5M'
     }
   },
   beforeDestroy () {
@@ -209,35 +207,28 @@ export default {
   },
   mounted () {
     var that = this
-
     updator.setMetricsCallBack(`timespan=${this.selected}`, function (data) {
-      console.log(data)
+      // console.log(data)
       if (data.d2c_avg === null) {
         that.iotHub.latency = 'NaN'
       } else {
         that.iotHub.latency = data.d2c_avg
       }
-
       if (data.sa_avg === null) {
         that.streamAnalytics.latency = 'NaN'
       } else {
         that.streamAnalytics.latency = data.sa_avg
       }
-
       that.iotHub.msgReceived = data.d2c_count
       that.streamAnalytics.processedMessage = data.sa_count
-
       that.streamAnalytics.failures = data.failure_sum
     })
-
     updator.setDeviceInfoCallback(function (data) {
-      console.log(data)
+      // console.log(data)
       that.device.connectedNum = data.connected
       that.device.registeredNum = data.registered
     })
-
     updator.startAll()
-
     jsPlumb.ready(function () {
       jsPlumb.connect({
         paintStyle: {
@@ -263,7 +254,6 @@ export default {
           }]
         ]
       })
-
       jsPlumb.connect({
         paintStyle: {
           stroke: '#999',
@@ -305,47 +295,39 @@ export default {
   text-align: left;
   margin: auto;
 }
-
 #item_left {
   margin-left: 70px;
   bottom: 10px;
 }
-
 .select{
   width: 150px;
   float: right;
   margin-top: 10px;
 }
-
 .item-left-table{
   position: absolute;
   bottom: 20px;
   left: 0;
   width: 100%;
 }
-
 #item_middle {
   margin-left: 150px;
 }
-
 .item-middle-table{
   position: absolute;
   bottom: 20px;
   left: 0;
   width: 100%;
 }
-
 #item_right {
   margin-left: 150px;
 }
-
 .item-right-table{
   position: absolute;
   bottom: 10px;
   left: 0;
   width: 100%;
 }
-
 .item {
   height: 100px;
   width: 200px;
@@ -354,7 +336,6 @@ export default {
   background-color: #F8F8F8;
   font-size: 12px;
 }
-
 .item-title {
   margin: 5px 0;
   text-align: center;
@@ -362,23 +343,17 @@ export default {
   color: #8b66ac;
   font-size: 16px;
 }
-
 .label-class {
   padding-bottom: 20px;
 }
-
 .svg-style {
   width: 15px;
   height: 15px;
   margin: auto;
 }
-
 .table-container {
   height: 70%;
   position: relative;
   margin: 0 4px;
 }
-
-
 </style>
-
