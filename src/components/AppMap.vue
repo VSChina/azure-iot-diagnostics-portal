@@ -128,7 +128,7 @@ class AppMapAutoUpdator {
   }
   getMetrics (param, callback) {
     $.ajax({
-      url: `https://zhqqi-diagnostic-rest.azurewebsites.net/metric/get/${param}`,
+      url: `/metric/get/${param}`,
       datatype: 'json',
       success: function (data) {
         callback(data)
@@ -146,7 +146,7 @@ class AppMapAutoUpdator {
   }
   getDeviceInfo (callback) {
     $.ajax({
-      url: `https://zhqqi-diagnostic-rest.azurewebsites.net/device/get_total`,
+      url: `/device/get_total`,
       datatype: 'json',
       success: function (data) {
         callback(data)
