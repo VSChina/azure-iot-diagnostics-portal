@@ -50,8 +50,6 @@
 </template>
 
 <script>
-const endpoint = 'https://zhqqi-diagnostic-rest.azurewebsites.net'
-
 export default {
   name: 'home',
   data () {
@@ -76,7 +74,7 @@ export default {
       this.result = 'Start updating diagnostics settings...'
       this.detailedResult = ''
       this.isUpdating = true
-      let url = `${endpoint}/job/trigger?diag_enable=${this.status === 'ON'}&diag_rate=${this.sample}&connection_string=${encodeURIComponent(this.connectionString)}`
+      let url = `/job/trigger?diag_enable=${this.status === 'ON'}&diag_rate=${this.sample}&connection_string=${encodeURIComponent(this.connectionString)}`
       if (this.devices) {
         url += `&devices=${this.devices}`
       }
@@ -85,7 +83,7 @@ export default {
           let jobId = data
           this.result = 'Updating diagnostics settings...'
           let jobMonitorInterval = setInterval(() => {
-            $.get(`${endpoint}/job/get?id=${jobId}&connection_string=${encodeURIComponent(this.connectionString)}`)
+            $.get(`/job/get?id=${jobId}&connection_string=${encodeURIComponent(this.connectionString)}`)
               .done((data) => {
                 if (data.status === 'completed' || data.status === 'failed' || data.status === 'cancelled') {
                   this.result = 'Stauts: ' + data.status
