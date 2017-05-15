@@ -77,7 +77,7 @@
                   </g>
                 </svg>
 
-                <svg viewBox="0 0 9 9" role="presentation" aria-hidden="true" focusable="false" v-if="streamAnalytics.failures >= 5 && streamAnalytics.failures < 20">
+                <svg viewBox="0 0 9 9" role="presentation" aria-hidden="true" focusable="false" v-else-if="streamAnalytics.failures < 20">
                   <g aria-hidden="true" role="presentation">
                     <path d="M8.267 8H.733c-.6 0-.916-.623-.62-1.129L2.014 3.53 3.896.384c.302-.507.903-.514 1.197-.008L7.001 3.65l1.882 3.229C9.183 7.383 8.881 8 8.267 8z" aria-hidden="true" role="presentation" class="msportalfx-svg-c10" style="fill: #ff8c00;"></path>
                     <circle cx="4.5" cy="6.178" r="0.615" aria-hidden="true" role="presentation" class="msportalfx-svg-c01" style="fill: #fff;"></circle>
@@ -85,7 +85,7 @@
                   </g>
                 </svg>
 
-                <svg viewBox="0 0 9 9" role="presentation" aria-hidden="true" focusable="false" v-if="streamAnalytics.failures >= 20">
+                <svg viewBox="0 0 9 9" role="presentation" aria-hidden="true" focusable="false" v-else>
                   <g aria-hidden="true" role="presentation">
                     <circle cx="4.5" cy="4.5" r="4.5" aria-hidden="true" role="presentation" class="msportalfx-svg-c22" style="fill: #e81123;"></circle>
                     <circle cx="4.5" cy="6.438" r="0.697" aria-hidden="true" role="presentation" class="msportalfx-svg-c01" style="fill: #fff;"></circle>
@@ -128,7 +128,7 @@ class AppMapAutoUpdator {
   }
   getMetrics (param, callback) {
     $.ajax({
-      url: `/metric/get/${param}`,
+      url: `/metric/get/${param}?time=${Date.now()}`,
       datatype: 'json',
       success: function (data) {
         callback(data)
@@ -146,7 +146,7 @@ class AppMapAutoUpdator {
   }
   getDeviceInfo (callback) {
     $.ajax({
-      url: `/device/get_total`,
+      url: `/device/get_total?time=${Date.now()}`,
       datatype: 'json',
       success: function (data) {
         callback(data)
