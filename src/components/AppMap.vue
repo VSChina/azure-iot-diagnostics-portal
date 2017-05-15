@@ -65,19 +65,19 @@
             <td></td>
           </tr>
           <tr>
-            <td>{{streamAnalytics.processedMessage+streamAnalytics.failures == 0 ? "0" : (streamAnalytics.failures/(streamAnalytics.processedMessage+streamAnalytics.failures)*100).toFixed(2) + "%"}}</td>
+            <td>{{streamAnalytics.failurePercentage + "%"}}</td>
             <td>Failures</td>
             <td>
               <div class="svg-style">
 
-                <svg viewBox="0 0 16 16" role="presentation" aria-hidden="true" focusable="false" v-if="streamAnalytics.failures < 5">
+                <svg viewBox="0 0 16 16" role="presentation" aria-hidden="true" focusable="false" v-if="streamAnalytics.failurePercentage < 5">
                   <g aria-hidden="true" role="presentation">
                     <circle cx="8" cy="8" r="8" aria-hidden="true" role="presentation" class="msportalfx-svg-c14" style="fill: green;"></circle>
                     <path d="M3.989 8.469L3.7 8.156a.207.207 0 0 1 .012-.293l.835-.772a.204.204 0 0 1 .289.012l2.296 2.462 3.951-5.06a.204.204 0 0 1 .289-.035l.903.697a.198.198 0 0 1 .035.285l-5.075 6.497-3.246-3.48z" aria-hidden="true" role="presentation" class="msportalfx-svg-c01" style="fill: white;"></path>
                   </g>
                 </svg>
 
-                <svg viewBox="0 0 9 9" role="presentation" aria-hidden="true" focusable="false" v-else-if="streamAnalytics.failures < 20">
+                <svg viewBox="0 0 9 9" role="presentation" aria-hidden="true" focusable="false" v-else-if="streamAnalytics.failurePercentage < 20">
                   <g aria-hidden="true" role="presentation">
                     <path d="M8.267 8H.733c-.6 0-.916-.623-.62-1.129L2.014 3.53 3.896.384c.302-.507.903-.514 1.197-.008L7.001 3.65l1.882 3.229C9.183 7.383 8.881 8 8.267 8z" aria-hidden="true" role="presentation" class="msportalfx-svg-c10" style="fill: #ff8c00;"></path>
                     <circle cx="4.5" cy="6.178" r="0.615" aria-hidden="true" role="presentation" class="msportalfx-svg-c01" style="fill: #fff;"></circle>
@@ -193,7 +193,7 @@ export default {
     return {
       device: { registeredNum: 1, connectedNum: 0 },
       iotHub: { latency: 1, msgReceived: 0 },
-      streamAnalytics: { processedMessage: 1, latency: 0, failures: 15 },
+      streamAnalytics: { processedMessage: 0, latency: 0, failures: 0, failurePercentage: 0 },
       selected: 'PT5M'
     }
   },
@@ -222,6 +222,11 @@ export default {
       that.iotHub.msgReceived = data.d2c_count
       that.streamAnalytics.processedMessage = data.sa_count
       that.streamAnalytics.failures = data.failure_sum
+      var percentage = 0
+      if (that.streamAnalytics.processedMessage + that.streamAnalytics.failures !== 0) {
+        percentage = (that.streamAnalytics.failures / (that.streamAnalytics.processedMessage + that.streamAnalytics.failures) * 100).toFixed(2)
+      }
+      that.streamAnalytics.failurePercentage = percentage
     })
     updator.setDeviceInfoCallback(function (data) {
       // console.log(data)
