@@ -198,7 +198,8 @@ export default {
     }
   },
   beforeDestroy () {
-    jsPlumb.detachEveryConnection()
+    updator.stopAll()
+    jsPlumb.deleteEveryConnection()
   },
   methods: {
     updateMetricsParam: function () {
