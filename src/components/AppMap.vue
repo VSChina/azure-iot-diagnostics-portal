@@ -102,7 +102,7 @@
     <div class="select">
     <label for="selected">Timespan</label>
     <select class="form-control" v-model="selected" @change="updateMetricsParam()">
-      <option value="PT5M">5 Minutes</option>
+      <option value="PT10M">10 Minutes</option>
       <option value="PT1H">1 Hour</option>
       <option value="PT24H">24 Hour</option>
       <option value="P7D">7 Day</option>
@@ -194,7 +194,7 @@ export default {
       device: { registeredNum: 1, connectedNum: 0 },
       iotHub: { latency: 1, msgReceived: 0 },
       streamAnalytics: { processedMessage: 0, latency: 0, failures: 0, failurePercentage: 0 },
-      selected: 'PT5M'
+      selected: 'PT10M'
     }
   },
   beforeDestroy () {
