@@ -253,41 +253,18 @@ class AppMapAutoUpdator {
   }
 };
 
-function getCookie (cookieName) {
-  var name = cookieName + '='
-  var decodedCookie = decodeURIComponent(document.cookie)
-  var cookies = decodedCookie.split(';')
-  for (var i = 0; i < cookies.length; i++) {
-    var cookie = cookies[i]
-    while (cookie.charAt(0) === ' ') {
-      cookie = cookie.substring(1)
-    }
-    if (cookie.indexOf(name) === 0) {
-      return cookie.substring(name.length, cookie.length)
-    }
-  }
-  return ''
-}
-
-function setCookie (name, value, expireDays) {
-  var date = new Date()
-  date.setTime(date.getTime() + (expireDays * 24 * 60 * 60 * 1000))
-  var expires = 'expires=' + date.toUTCString()
-  document.cookie = name + '=' + value + ';' + expires + ';path=/'
-}
-
 var updator = new AppMapAutoUpdator(2000)
 export default {
   name: 'appMap',
   data () {
     return {
-      device: { registeredNum: 1, connectedNum: 0 },
-      iotHub: { latency: 1, msgReceived: 0 },
+      device: { registeredNum: 0, connectedNum: 0 },
+      iotHub: { latency: 0, msgReceived: 0 },
       streamAnalytics: { processedMessage: 0, latency: 0, failures: 0, failurePercentage: 0 },
       selected: 'PT10M',
       functionApp: { processedMessage: 0, latency: 0, failures: 0, failurePercentage: 0 },
-      showFunc: getCookie('showFunc') === 'true',
-      showSA: getCookie('showSA') === 'true',
+      showFunc: localStorage.getItem('showFunc') ? localStorage.getItem('showFunc') === 'true' : true,
+      showSA: localStorage.getItem('showSA') ? localStorage.getItem('showFunc') === 'true' : true,
       jsPlumb: require('jsplumb').jsPlumb
     }
   },
@@ -301,7 +278,7 @@ export default {
         }
         this.jsPlumb.repaintEverything()
       }, 0)
-      setCookie('showFunc', val, 365)
+      localStorage.setItem('showFunc', val)
     },
     'showSA': function (val, oldVal) {
       setTimeout(function () {
@@ -312,7 +289,7 @@ export default {
         }
         this.jsPlumb.repaintEverything()
       }, 0)
-      setCookie('showSA', val, 365)
+      localStorage.setItem('showSA', val)
     }
   },
   beforeDestroy () {
