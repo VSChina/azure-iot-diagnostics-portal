@@ -86,7 +86,7 @@ export default {
             $.get(`/job/get?id=${jobId}&connection_string=${encodeURIComponent(this.connectionString)}`)
               .done((data) => {
                 if (data.status === 'completed' || data.status === 'failed' || data.status === 'cancelled') {
-                  this.result = 'Stauts: ' + data.status
+                  this.result = 'Status: ' + data.status
                   let detailedResult = {
                     createdTime: data.createdTime,
                     startTime: data.startTime,
