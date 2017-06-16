@@ -34,13 +34,18 @@
             <col width="50%">
             <col width="20%" align="right">
             <tr>
-              <td>{{isNaN(iotHub.msgReceived) ? "-" : iotHub.msgReceived}}</td>
+              <td>{{isNaN(iotHub.processedMessage) ? "-" : iotHub.processedMessage}}</td>
               <td>Msgs Received</td>
               <td></td>
             </tr>
             <tr>
               <td>{{isNaN(iotHub.latency) ? "-" : iotHub.latency+" ms"}}</td>
               <td>Avg Latency</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>{{isNaN(iotHub.latencyMax) ? "-" : iotHub.latencyMax+" ms"}}</td>
+              <td>Max Latency</td>
               <td></td>
             </tr>
           </table>
@@ -65,6 +70,11 @@
               <tr>
                 <td>{{isNaN(streamAnalytics.latency) ? "-" : streamAnalytics.latency + " ms"}}</td>
                 <td>Avg Latency</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>{{isNaN(streamAnalytics.latencyMax) ? "-" : streamAnalytics.latencyMax + " ms"}}</td>
+                <td>Max Latency</td>
                 <td></td>
               </tr>
               <tr>
@@ -120,6 +130,11 @@
               <tr>
                 <td>{{isNaN(functionApp.latency) ? "-" : functionApp.latency+" ms"}}</td>
                 <td>Avg Latency</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>{{isNaN(functionApp.latencyMax) ? "-" : functionApp.latencyMax+" ms"}}</td>
+                <td>Max Latency</td>
                 <td></td>
               </tr>
               <tr>
@@ -258,13 +273,13 @@ export default {
   name: 'appMap',
   data () {
     return {
-      device: { registeredNum: 0, connectedNum: 0 },
-      iotHub: { latency: 0, msgReceived: 0 },
-      streamAnalytics: { processedMessage: 0, latency: 0, failures: 0, failurePercentage: 0 },
+      device: { registeredNum: '-', connectedNum: '-' },
+      iotHub: { latency: '-', processedMessage: '-', latencyMax: '-' },
+      streamAnalytics: { processedMessage: '-', latency: '-', failures: '-', failurePercentage: '-', latencyMax: '-' },
       selected: 'PT10M',
-      functionApp: { processedMessage: 0, latency: 0, failures: 0, failurePercentage: 0 },
+      functionApp: { processedMessage: '-', latency: '-', failures: '-', failurePercentage: '-', latencyMax: '-' },
       showFunc: localStorage.getItem('showFunc') ? localStorage.getItem('showFunc') === 'true' : true,
-      showSA: localStorage.getItem('showSA') ? localStorage.getItem('showFunc') === 'true' : true,
+      showSA: localStorage.getItem('showSA') ? localStorage.getItem('showSA') === 'true' : true,
       jsPlumb: require('jsplumb').jsPlumb
     }
   },
@@ -304,31 +319,29 @@ export default {
   },
   mounted () {
     var that = this
+
+    function analyse (source, dataSuccess, dataFailure) {
+      if (dataSuccess) {
+        source.latency = dataSuccess.avg === null ? '-' : dataSuccess.avg
+        source.latencyMax = dataSuccess.max === null ? '-' : dataSuccess.max
+        source.processedMessage = dataSuccess.count
+      }
+      if (dataFailure) {
+        source.failures = dataFailure.sum
+        var percentage = 0
+        if (source.processedMessage + source.failures !== 0) {
+          percentage = (source.failures / (source.processedMessage + source.failures) * 100).toFixed(2)
+        }
+        source.failurePercentage = percentage
+      }
+    }
+
     updator.setMetricsCallBack(`timespan=${this.selected}`, function (data) {
-      var percentage
-      that.iotHub.latency = data.d2c_avg === null ? '-' : data.d2c_avg
-      that.iotHub.msgReceived = data.d2c_count
-
-      that.streamAnalytics.latency = data.sa_avg === null ? '-' : data.sa_avg
-      that.streamAnalytics.processedMessage = data.sa_count
-      that.streamAnalytics.failures = data.sa_failure_count
-
-      percentage = 0
-      if (that.streamAnalytics.processedMessage + that.streamAnalytics.failures !== 0) {
-        percentage = (that.streamAnalytics.failures / (that.streamAnalytics.processedMessage + that.streamAnalytics.failures) * 100).toFixed(2)
-      }
-      that.streamAnalytics.failurePercentage = percentage
-
-      that.functionApp.latency = data.func_avg === null ? '-' : data.func_avg
-      that.functionApp.processedMessage = data.func_count
-      that.functionApp.failures = data.func_failure_count
-
-      percentage = 0
-      if (that.functionApp.processedMessage + that.functionApp.failures !== 0) {
-        percentage = (that.functionApp.failures / (that.functionApp.processedMessage + that.functionApp.failures) * 100).toFixed(2)
-      }
-      that.functionApp.failurePercentage = percentage
+      analyse(that.iotHub, data.d2c_success)
+      analyse(that.streamAnalytics, data.sa_success, data.sa_failure_count)
+      analyse(that.functionApp, data.func_success, data.func_failure_count)
     })
+
     updator.setDeviceInfoCallback(function (data) {
       that.device.connectedNum = data.connected
       that.device.registeredNum = data.registered
@@ -475,7 +488,7 @@ export default {
   width: 100%;
 }
 .item {
-  height: 100px;
+  height: 120px;
   width: 200px;
   border: 1px solid #d0d0d0;
   float: left;
