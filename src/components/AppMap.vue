@@ -123,11 +123,6 @@
               <col width="50%">
               <col width="20%" align="right">
               <tr>
-                <td>{{isNaN(functionApp.processedMessage) ? "-" : functionApp.processedMessage+functionApp.failures}}</td>
-                <td>Msgs Processed</td>
-                <td></td>
-              </tr>
-              <tr>
                 <td>{{isNaN(functionApp.latency) ? "-" : functionApp.latency+" ms"}}</td>
                 <td>Avg Latency</td>
                 <td></td>
@@ -137,9 +132,14 @@
                 <td>Max Latency</td>
                 <td></td>
               </tr>
+               <tr>
+                <td>{{isNaN(functionApp.processedMessage) ? "-" : functionApp.processedMessage+functionApp.failures}}</td>
+                <td>Total Requests</td>
+                <td></td>
+              </tr>
               <tr>
-                <td>{{isNaN(functionApp.failurePercentage) ? "-" : functionApp.failurePercentage + "%"}}</td>
-                <td>Failures</td>
+                <td>{{isNaN(functionApp.failures) ? "-" : functionApp.failures}}</td>
+                <td>Failure Requests</td>
                 <td>
                   <div class="svg-style">
 
@@ -168,6 +168,14 @@
 
                   </div>
                 </td>
+              </tr>
+              <tr>
+                <td>{{functionApp.systemFailures}}</td>
+                <td><a href="/metric/kusto" title="Use the query below for detailed information:
+                exceptions
+                | where innermostMessage !startswith &quot;E2EDiagnosticsError&quot;
+                | order by timestamp desc" target="_blank">System Failures</a></td>
+                <td></td>
               </tr>
             </table>
           </div>
@@ -277,7 +285,7 @@ export default {
       iotHub: { latency: '-', processedMessage: '-', latencyMax: '-' },
       streamAnalytics: { processedMessage: '-', latency: '-', failures: '-', failurePercentage: '-', latencyMax: '-' },
       selected: 'PT10M',
-      functionApp: { processedMessage: '-', latency: '-', failures: '-', failurePercentage: '-', latencyMax: '-' },
+      functionApp: { processedMessage: '-', latency: '-', failures: '-', failurePercentage: '-', latencyMax: '-', systemFailures: '-' },
       showFunc: localStorage.getItem('showFunc') ? localStorage.getItem('showFunc') === 'true' : true,
       showSA: localStorage.getItem('showSA') ? localStorage.getItem('showSA') === 'true' : true,
       jsPlumb: require('jsplumb').jsPlumb
@@ -320,7 +328,7 @@ export default {
   mounted () {
     var that = this
 
-    function analyse (source, dataSuccess, dataFailure) {
+    function analyse (source, dataSuccess, dataFailure, systemFailures) {
       if (dataSuccess) {
         source.latency = dataSuccess.avg === null ? '-' : dataSuccess.avg
         source.latencyMax = dataSuccess.max === null ? '-' : dataSuccess.max
@@ -334,12 +342,16 @@ export default {
         }
         source.failurePercentage = percentage
       }
+
+      if (systemFailures) {
+        source.systemFailures = systemFailures.sum
+      }
     }
 
     updator.setMetricsCallBack(`timespan=${this.selected}`, function (data) {
       analyse(that.iotHub, data.d2c_success)
       analyse(that.streamAnalytics, data.sa_success, data.sa_failure_count)
-      analyse(that.functionApp, data.func_success, data.func_failure_count)
+      analyse(that.functionApp, data.func_success, data.func_failure_count, data.func_system_failure)
     })
 
     updator.setDeviceInfoCallback(function (data) {
@@ -488,8 +500,8 @@ export default {
   width: 100%;
 }
 .item {
-  height: 120px;
-  width: 200px;
+  height: 140px;
+  width: 210px;
   border: 1px solid #d0d0d0;
   float: left;
   background-color: #F8F8F8;
