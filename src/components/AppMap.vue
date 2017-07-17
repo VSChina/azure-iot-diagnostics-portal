@@ -344,7 +344,7 @@ export default {
       }
 
       if (systemFailures) {
-        source.systemFailures = systemFailures.sum
+        source.systemFailures = Math.floor(systemFailures.sum / 2)
       }
     }
 
